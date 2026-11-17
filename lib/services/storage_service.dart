@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/discover_filter_preset.dart';
 import '../models/student.dart';
 import '../models/team.dart';
 import '../models/team_request.dart';
@@ -8,6 +9,7 @@ class StorageService {
   static const _kProfile = 'profile';
   static const _kRequests = 'requests';
   static const _kTeam = 'team';
+  static const _kDiscoverFilterPresets = 'discover_filter_presets';
 
   Future<SharedPreferences> get _p => SharedPreferences.getInstance();
 
@@ -49,7 +51,8 @@ class StorageService {
     if (t == null) {
       await p.remove(_kTeam);
     } else {
-      await p.setString(_kTeam, jsonEncode(t.toJson()));
+      final saved = await p.setString(_kTeam, jsonEncode(t.toJson()));
+      if (!saved) throw StateError('Could not save team.');
     }
   }
 
@@ -61,5 +64,26 @@ class StorageService {
     } catch (_) {
       return null;
     }
+  }
+
+  Future<List<DiscoverFilterPreset>> loadDiscoverFilterPresets() async {
+    final raw = (await _p).getString(_kDiscoverFilterPresets);
+    if (raw == null) return [];
+
+    final decoded = jsonDecode(raw);
+    if (decoded is! List) {
+      throw const FormatException('Invalid saved filters data.');
+    }
+    return [for (final item in decoded) DiscoverFilterPreset.fromJson(item)];
+  }
+
+  Future<void> saveDiscoverFilterPresets(
+    List<DiscoverFilterPreset> presets,
+  ) async {
+    final saved = await (await _p).setString(
+      _kDiscoverFilterPresets,
+      jsonEncode(presets.map((preset) => preset.toJson()).toList()),
+    );
+    if (!saved) throw StateError('Could not save discover filters.');
   }
 }

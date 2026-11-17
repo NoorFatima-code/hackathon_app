@@ -27,19 +27,19 @@ class MatchService {
           '$n shared interest${n > 1 ? 's' : ''}: ${sharedInterests.join(', ')}');
     }
 
-    // 2) Skills needed (25): team ke open roles, warna jo skills mere paas nahi
-    final hasTeamRoles = team != null && team.rolesNeeded.isNotEmpty;
-    final needed = hasTeamRoles
-        ? team.rolesNeeded
+    // 2) Skills needed (25): team skill needs, otherwise skills the profile lacks.
+    final hasTeamSkills = team != null && team.skillsNeeded.isNotEmpty;
+    final needed = hasTeamSkills
+        ? team.skillsNeeded
         : [
             for (final s in other.skills)
-              if (!me.skills.contains(s)) s
+              if (!me.skills.contains(s)) s,
           ];
     final matched = other.skills.where(needed.contains).toSet();
     if (matched.isNotEmpty) {
       total += 25 * (matched.length / 2).clamp(0.0, 1.0);
       reasons.add(
-          'Has ${matched.join(', ')}, which ${hasTeamRoles ? 'your team needs' : 'you could use'}');
+          'Has ${matched.join(', ')}, which ${hasTeamSkills ? 'your team needs' : 'you could use'}');
     }
 
     // 3) Same project type (20)

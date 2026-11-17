@@ -27,7 +27,10 @@ class BestMatchesScreen extends StatelessWidget {
     }
 
     final results = MatchService.bestMatches(me, state.students, state.team);
-    final usingTeam = state.team != null && state.team!.rolesNeeded.isNotEmpty;
+    final usingTeam =
+        state.team != null &&
+        (state.team!.rolesNeeded.isNotEmpty ||
+            state.team!.skillsNeeded.isNotEmpty);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Best Matches')),

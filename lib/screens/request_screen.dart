@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../data/sample_data.dart';
 import '../models/team_request.dart';
 import '../providers/app_state.dart';
 import '../theme/app_theme.dart';
+import '../widgets/assign_roles_dialog.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/status_badge.dart';
@@ -89,11 +91,25 @@ class _RequestCard extends StatelessWidget {
 
   Future<void> _accept(BuildContext context) async {
     final state = context.read<AppState>();
-    if (state.team == null) {
+    final team = state.team;
+    if (team == null) {
       _toast(context, 'Create your team first in the My Team tab');
       return;
     }
-    await state.respondToRequest(request.id, accept: true);
+
+    final roles = await showAssignRolesDialog(
+      context: context,
+      memberName: request.student.name,
+      projectType: team.projectType,
+      options: team.rolesNeeded.isEmpty ? teamRoleOptions : team.rolesNeeded,
+    );
+    if (roles == null || !context.mounted) return;
+
+    await state.respondToRequest(
+      request.id,
+      accept: true,
+      assignedRoles: roles,
+    );
     if (context.mounted) {
       _toast(context, '${request.student.name} added to your team');
     }

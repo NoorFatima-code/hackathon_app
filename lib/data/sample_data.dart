@@ -5,6 +5,15 @@ const departments = ['CS', 'SE', 'AI', 'EE', 'BBA'];
 const semesters = [4, 5, 6, 7, 8];
 const projectTypes = ['Semester Project', 'FYP'];
 const availabilityOptions = ['Weekdays', 'Weekends', 'Evenings', 'Flexible'];
+const teamRoleOptions = [
+  'Backend Developer',
+  'Data Scientist',
+  'Frontend Developer',
+  'Mobile App Developer',
+  'Project Manager',
+  'QA / Test Engineer',
+  'UI/UX Designer',
+];
 
 const allSkills = [
   'Flutter', 'Dart', 'React', 'Laravel', 'Java', 'Python', 'Machine Learning',
