@@ -1,17 +1,23 @@
-# hackathon_app
+# TeamUp
 
-A new Flutter project.
+TeamUp is a Flutter app that helps students find project teammates based on their skills, interests, and availability.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- Create and edit a student profile with a photo and profile-completeness meter.
+- Preview your profile before sharing it.
+- Select multiple skills and interests from dropdowns.
+- Discover and search student profiles; filter by department, semester, skill, and project type.
+- Find suggested teammate matches and save named discovery filters.
+- Send, accept, reject, or cancel team requests.
+- Create a team, list needed roles and skills, and manage members.
+- Chat with your team.
+- Save profiles, teams, requests, and preferences locally on the device.
 
-A few resources to get you started if this is your first Flutter project:
+## Getting started
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+Install Flutter, then run:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter pub get
+flutter run
