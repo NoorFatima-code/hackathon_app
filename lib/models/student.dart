@@ -8,6 +8,7 @@ class Student {
   final String projectType;
   final String availability;
   final String bio;
+  final String? photoData;
 
   const Student({
     required this.id,
@@ -19,6 +20,7 @@ class Student {
     required this.projectType,
     required this.availability,
     this.bio = '',
+    this.photoData,
   });
 
   Student copyWith({
@@ -30,6 +32,7 @@ class Student {
     String? projectType,
     String? availability,
     String? bio,
+    String? photoData,
   }) =>
       Student(
         id: id,
@@ -41,6 +44,7 @@ class Student {
         projectType: projectType ?? this.projectType,
         availability: availability ?? this.availability,
         bio: bio ?? this.bio,
+        photoData: photoData ?? this.photoData,
       );
 
   Map<String, dynamic> toJson() => {
@@ -53,6 +57,7 @@ class Student {
         'projectType': projectType,
         'availability': availability,
         'bio': bio,
+        'photoData': photoData,
       };
 
   factory Student.fromJson(Map<String, dynamic> j) => Student(
@@ -65,5 +70,6 @@ class Student {
         projectType: j['projectType'] as String,
         availability: j['availability'] as String,
         bio: (j['bio'] ?? '') as String,
+        photoData: j['photoData'] as String?,
       );
 }

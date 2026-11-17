@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hackathon_app/main.dart';
+import 'package:hackathon_app/models/student.dart';
 import 'package:hackathon_app/providers/app_state.dart';
 import 'package:hackathon_app/screens/home_shell.dart';
 import 'package:hackathon_app/screens/my_team_screen.dart';
 import 'package:hackathon_app/models/team.dart';
 import 'package:hackathon_app/models/team_chat_message.dart';
 import 'package:hackathon_app/models/team_request.dart';
-import 'package:hackathon_app/models/student.dart';
 import 'package:hackathon_app/services/match_service.dart';
 import 'package:hackathon_app/screens/request_screen.dart';
 import 'package:hackathon_app/screens/team_chat_screen.dart';
 import 'package:hackathon_app/services/storage_service.dart';
+import 'package:hackathon_app/screens/profile_screen.dart';
 import 'package:hackathon_app/theme/app_theme.dart';
 import 'package:hackathon_app/widgets/student_card.dart';
 import 'package:hackathon_app/data/sample_data.dart';
@@ -59,10 +60,20 @@ void main() {
       ),
       isFalse,
     );
+
     expect(skillsResult.reasons, contains('Has React, which your team needs'));
   });
 
-  testWidgets('opens profile setup without an auth gate', (tester) async {
+  test('profile photo is retained by profile serialization', () {
+    final profile = sampleStudents.first.copyWith(photoData: 'AA==');
+    final restored = Student.fromJson(profile.toJson());
+
+    expect(restored.photoData, 'AA==');
+  });
+
+  testWidgets('landing screen opens profile setup without an auth gate', (
+    tester,
+  ) async {
     SharedPreferences.setMockInitialValues({});
     await tester.pumpWidget(
       ChangeNotifierProvider(
@@ -72,10 +83,121 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Welcome to TeamUp'), findsNothing);
-    expect(find.text('Create your account'), findsNothing);
+    expect(
+      find.text('Find your people.\nBuild something great.'),
+      findsOneWidget,
+    );
+    expect(find.text('Get started'), findsOneWidget);
+    await tester.tap(find.text('Get started'));
+    await tester.pumpAndSettle();
+
     expect(find.text('Create Profile'), findsOneWidget);
     expect(find.byType(NavigationBar), findsOneWidget);
+  });
+
+  testWidgets('skills and interests use multi-select dropdowns', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => AppState(),
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: const ProfileScreen(),
+        ),
+      ),
+    );
+
+    final skillsDropdown = find.byKey(const ValueKey('skills-dropdown'));
+    await tester.scrollUntilVisible(
+      skillsDropdown,
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(skillsDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('skills-option-Flutter')));
+    await tester.pumpAndSettle();
+    expect(find.text('Flutter'), findsOneWidget);
+
+    final interestsDropdown = find.byKey(const ValueKey('interests-dropdown'));
+    await tester.scrollUntilVisible(
+      interestsDropdown,
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(interestsDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('interests-option-Mobile Apps')),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Mobile Apps'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('saved profile has separate preview and edit actions', (
+    tester,
+  ) async {
+    final appState = AppState()..me = sampleStudents.first;
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => appState,
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: const ProfileScreen(),
+        ),
+      ),
+    );
+
+    expect(find.text('Profile completeness'), findsOneWidget);
+    expect(find.text('89%'), findsOneWidget);
+    await tester.tap(
+      find.byKey(const ValueKey('profile-overview-photo-picker')),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.text(
+        'Photo picker unavailable. Fully restart the app and try again.',
+      ),
+      findsOneWidget,
+    );
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('profile-preview-button')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(
+      find.byKey(const ValueKey('profile-preview-button')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('profile-edit-button')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('profile-preview-button')));
+    await tester.pumpAndSettle();
+    expect(find.text('Profile preview'), findsOneWidget);
+    expect(find.text('Skills'), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('profile-edit-button')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.byKey(const ValueKey('profile-edit-button')));
+    await tester.pumpAndSettle();
+    expect(find.text('Edit profile'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Save changes'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Save changes'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('shows left navigation rail on wide layouts', (tester) async {

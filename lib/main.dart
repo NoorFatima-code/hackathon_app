@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/app_state.dart';
-import 'screens/home_shell.dart';
+import 'screens/landing_screen.dart';
 import 'theme/app_theme.dart';
 import 'widgets/empty_state.dart';
 
@@ -46,6 +46,6 @@ class _Root extends StatelessWidget {
         ),
       );
     }
-    return const HomeShell();
+    return const LandingScreen();
   }
 }
